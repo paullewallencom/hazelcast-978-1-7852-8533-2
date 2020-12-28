@@ -1,0 +1,18 @@
+<hazelcast>
+  <cache name="capitals">
+    <key-type class-name="java.lang.String" />
+    <value-type class-name="java.lang.String" />
+    <read-through>true</read-through>
+    <write-through>true</write-through>
+  </cache>
+
+  <map name="capitals">
+    <map-store enabled="true">
+      <class-name>
+        store.ExampleCapitalsStore
+      </class-name>
+
+      <write-delay-seconds>0</write-delay-seconds>
+    </map-store>
+  </map>
+</hazelcast>

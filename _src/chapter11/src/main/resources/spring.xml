@@ -1,0 +1,45 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:hz="http://www.hazelcast.com/schema/spring"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.hazelcast.com/schema/spring http://www.hazelcast.com/schema/spring/hazelcast-spring-3.5.xsd">
+
+  <hz:hazelcast id="hzInstance">
+    <hz:config>
+      <hz:group name="london" password="london-pass"/>
+
+      <hz:wan-replication name="our-global-cluster">
+        <hz:target-cluster group-name="paris" group-password="paris-pass">
+          <hz:replication-impl>
+            com.hazelcast.wan.impl.WanNoDelayReplication
+          </hz:replication-impl>
+          <hz:end-points>
+            <hz:address>12.34.56.78</hz:address>
+          </hz:end-points>
+        </hz:target-cluster>
+      </hz:wan-replication>
+
+      <hz:network port="5701" port-auto-increment="false">
+        <hz:join>
+          <hz:multicast
+            enabled="true"
+            multicast-group="224.2.2.3"
+            multicast-port="54327"/>
+        </hz:join>
+      </hz:network>
+
+      <hz:map
+        name="default"
+        backup-count="2"
+        read-backup-data="true"
+        merge-policy="com.hazelcast.map.merge.LatestUpdateMapMergePolicy">
+        <hz:wan-replication-ref
+          name="our-global-cluster"
+          merge-policy="com.hazelcast.map.merge.LatestUpdateMapMergePolicy"/>
+      </hz:map>
+
+    </hz:config>
+  </hz:hazelcast>
+
+  <hz:map id="capitalsMap" instance-ref="hzInstance" name="capitals" />
+</beans>
